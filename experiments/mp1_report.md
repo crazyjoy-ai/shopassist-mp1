@@ -14,8 +14,15 @@ event. Name the functions it passes through, where memory, the system prompt and
 through the gateway (which container calls which, on which URL).
 
 ## 3. Memory: my choice, with numbers
-TODO: window or summary, and your KEEP_TURNS. Use numbers from your Session 19 report (tokens per call, recall at
-turn 17), and say what your choice forgets, or risks getting wrong. What would a customer notice?
+My memory strategy is a sliding window that keeps the last four turns (`KEEP_TURNS=4`). Session 19 measured the
+cost of the last turn in a 17-turn chat. Resending the whole history took 1,896 tokens, the window took 1,013, and
+the summary took 1,343. The catch is recall: the reference number from turn 2 was missing from the window's reply
+and from the summary's reply at turn 17, and only the full history returned it. Even so, the window is the better
+fit for a store bot. Most customers ask about an order status, a return or a quick follow-up, so a short, fixed
+slice of history is enough, and it avoids the extra model call that a summary needs. Four turns also keeps the
+order number from turn 1 in view at turn 4, which is what the workbook's memory probe checks. The downside is that
+anything older than four turns is dropped without warning, so in a long chat a customer might have to give the
+order number or another earlier detail again.
 
 ## 4. Tools and validation
 TODO: your three tools and what you validate (order id format, pincode, speed, reason). Give one bad argument your
